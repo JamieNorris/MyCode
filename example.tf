@@ -1,6 +1,6 @@
 ## AWS ##
 provider "aws" {
-region     = var.region
+region     = var.awsregion
 }
 
 resource "aws_instance" "example" {
@@ -8,8 +8,8 @@ resource "aws_instance" "example" {
   instance_type = "t2.micro"
 }
 
-
 ## Azure ##
+
 
 provider "azurerm" {
  # Whilst version is optional, we /strongly recommend/ using it to pin the version of the Provider being used
@@ -18,12 +18,12 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg" {
 name     = "myTFResourceGroup"
-location = "eastus"
+location = var.azurlocation
 }
 resource "azurerm_virtual_network" "vnet" {
     name                = "myTFVnet"
     address_space       = ["10.0.0.0/16"]
-    location            = "eastus"
+    location            = var.azurlocation
     resource_group_name = "${azurerm_resource_group.rg.name}"
 }
 
@@ -39,7 +39,7 @@ resource "azurerm_subnet" "subnet" {
 # Create public IP
 resource "azurerm_public_ip" "publicip" {
     name                         = "myTFPublicIP"
-    location                     = "eastus"
+    location                     = var.azurlocation
     resource_group_name          = "${azurerm_resource_group.rg.name}"
     public_ip_address_allocation = "dynamic"
 }
@@ -47,7 +47,7 @@ resource "azurerm_public_ip" "publicip" {
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "nsg" {
     name                = "myTFNSG"
-    location            = "eastus"
+    location            = var.azurlocation
     resource_group_name = "${azurerm_resource_group.rg.name}"
 
     security_rule {
@@ -66,7 +66,7 @@ resource "azurerm_network_security_group" "nsg" {
 # Create network interface
 resource "azurerm_network_interface" "nic" {
     name                      = "myNIC"
-    location                  = "eastus"
+    location                  = var.azurlocation
     resource_group_name       = "${azurerm_resource_group.rg.name}"
     network_security_group_id = "${azurerm_network_security_group.nsg.id}"
 
@@ -81,7 +81,7 @@ resource "azurerm_network_interface" "nic" {
 # Create a Linux virtual machine
 resource "azurerm_virtual_machine" "vm" {
     name                  = "myTFVM"
-    location              = "eastus"
+    location              = var.azurlocation
     resource_group_name   = "${azurerm_resource_group.rg.name}"
     network_interface_ids = ["${azurerm_network_interface.nic.id}"]
     vm_size               = "Standard_DS1_v2"
